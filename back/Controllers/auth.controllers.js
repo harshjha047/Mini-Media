@@ -65,6 +65,20 @@ exports.login = async (req, res) => {
     }
 };
 
+const isLoggedIn = (req, res, next) => {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json("login first");
+    }
+    try {
+      const data = jwt.verify(token, "hehehe");
+      req.user = data;
+      next();
+    } catch {
+      return res.status(401).json("login first");
+    }
+  };
+
 
 exports.logout = (req, res) => {
     try {

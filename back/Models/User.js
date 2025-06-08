@@ -37,8 +37,8 @@ const userSchema = new mongoose.Schema({
   },
 
   avatar: {
-    type: String, // store image URL or filename if using Multer
-    default: '',  // set a default avatar if needed
+    type: String, 
+    default: '',  
   },
 
   followers: [

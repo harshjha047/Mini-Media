@@ -77,3 +77,43 @@ exports.logout = (req, res) => {
     return handleError(res, 500, "Logout failed");
   }
 };
+
+exports.toggleFollow = async (req, res) => {
+  try {
+    const currentUser = await User.findOne({ email: req.user.email });
+    const targetUserId = req.params.id;
+
+    if (!currentUser) return res.status(401).json({ message: "Unauthorized" });
+    if (currentUser._id.toString() === targetUserId) {
+      return res.status(400).json({ message: "You can't follow yourself" });
+    }
+
+    const targetUser = await User.findById(targetUserId);
+    if (!targetUser) return res.status(404).json({ message: "User not found" });
+
+    const isFollowing = currentUser.following.includes(targetUserId);
+
+    if (isFollowing) {
+      // Unfollow
+      currentUser.following.pull(targetUserId);
+      targetUser.followers.pull(currentUser._id);
+    } else {
+      // Follow
+      currentUser.following.push(targetUserId);
+      targetUser.followers.push(currentUser._id);
+    }
+
+    await currentUser.save();
+    await targetUser.save();
+
+    res.status(200).json({
+      success: true,
+      following: !isFollowing,
+      message: isFollowing ? "User unfollowed" : "User followed",
+    });
+
+  } catch (err) {
+    console.error("Follow error:", err.message);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

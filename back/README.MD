@@ -34,14 +34,25 @@ Registers a new user with name, username, email, and password.
       "_id": "string",
       "name": "string",
       "username": "string",
-      "email": "string",
-      ...
+      "email": "string"
     }
   }
   ```
 - **400 Bad Request**: Missing required fields.
 - **409 Conflict**: Email already in use.
 - **500 Internal Server Error**: Registration failure.
+
+#### Example:
+```bash
+curl -X POST http://localhost:3000/api/auth/register \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "John Doe",
+    "username": "johnd",
+    "email": "john@example.com",
+    "password": "secret123"
+  }'
+```
 
 ---
 
@@ -67,14 +78,23 @@ Logs in an existing user with email and password. Responds with user data and se
       "_id": "string",
       "name": "string",
       "username": "string",
-      "email": "string",
-      ...
+      "email": "string"
     }
   }
   ```
 - **400 Bad Request**: Missing fields.
 - **401 Unauthorized**: Invalid credentials.
 - **500 Internal Server Error**: Login failure.
+
+#### Example:
+```bash
+curl -X GET http://localhost:3000/api/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "john@example.com",
+    "password": "secret123"
+  }'
+```
 
 ---
 
@@ -91,6 +111,48 @@ Logs out the user by clearing the cookie.
   }
   ```
 - **500 Internal Server Error**: Logout failure.
+
+#### Example:
+```bash
+curl -X POST http://localhost:3000/api/auth/logout
+```
+
+---
+
+### `PUT /:id/follow`
+#### Description:
+Toggles follow/unfollow for a user based on the provided user ID.
+
+#### Headers:
+- `Authorization: Bearer <token>`
+
+#### Response:
+- **200 OK**:
+  ```json
+  {
+    "success": true,
+    "following": true,
+    "message": "User followed"
+  }
+  ```
+  or
+  ```json
+  {
+    "success": true,
+    "following": false,
+    "message": "User unfollowed"
+  }
+  ```
+- **400 Bad Request**: Cannot follow yourself.
+- **401 Unauthorized**: Token missing or invalid.
+- **404 Not Found**: Target user not found.
+- **500 Internal Server Error**: Server error.
+
+#### Example:
+```bash
+curl -X PUT http://localhost:3000/api/auth/64dcb221e634e92dd1a879ab/follow \
+  -H "Authorization: Bearer <token>"
+```
 
 ---
 

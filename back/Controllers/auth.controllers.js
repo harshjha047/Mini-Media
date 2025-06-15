@@ -28,7 +28,12 @@ exports.register = async (req, res) => {
           password: hash,
         });
         const token = jwt.sign({ email }, process.env.JWT_SECRET || "hehehe");
-        res.cookie("token", token, { httpOnly: true });
+        // res.cookie("token", token, { httpOnly: true });
+        res.cookie("token", token, {
+          httpOnly: true,
+          sameSite: "lax", // or "strict" / "none" if using HTTPS
+          secure: false, // set true in production with HTTPS
+        });
         res.status(201).json({ success: true, user });
       });
     });
@@ -57,7 +62,12 @@ exports.login = async (req, res) => {
     }
 
     const token = jwt.sign({ email }, process.env.JWT_SECRET || "hehehe");
-    res.cookie("token", token, { httpOnly: true });
+    // res.cookie("token", token, { httpOnly: true });
+    res.cookie("token", token, {
+      httpOnly: true,
+      sameSite: "lax", // or "strict" / "none" if using HTTPS
+      secure: false, // set true in production with HTTPS
+    });
 
     return res.status(200).json({ success: true, user });
   } catch (err) {
@@ -111,7 +121,6 @@ exports.toggleFollow = async (req, res) => {
       following: !isFollowing,
       message: isFollowing ? "User unfollowed" : "User followed",
     });
-
   } catch (err) {
     console.error("Follow error:", err.message);
     res.status(500).json({ success: false, message: "Server error" });
